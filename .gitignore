@@ -1,0 +1,17 @@
+.env
+env
+venv
+temp
+tmp
+
+chronos/crontabs/*
+!chronos/crontabs/.gitkeep
+
+nginx/*/*
+!nginx/*/.gitkeep
+
+*.pyc
+*.sqlite
+*.coverage
+.DS_Store
+*.idea
