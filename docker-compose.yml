@@ -16,9 +16,9 @@ services:
     labels:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
 
-  userver-lestencrypt:
+  userver-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
-    container_name: userver-lestencrypt
+    container_name: userver-letsencrypt
     restart: unless-stopped
     depends_on:
       - userver-nginx-proxy

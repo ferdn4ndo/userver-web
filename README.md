@@ -1,13 +1,21 @@
-# uServer Auth
+# uServer Web
 
-Data management microservices stack based on PostgreSQL (permanent data), Redis (ephemeral data) and Adminer (DB UI interface).
+Web server microservices stack based on [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) (DNS reverse proxy), [letsencrypt-nginx-proxy-companion](https://github.com/nginx-proxy/docker-letsencrypt-nginx-proxy-companion) (SSL support and auto-renewal), [crontab-ui](https://github.com/alseambusher/crontab-ui) (cronjob management), and [netdata](https://github.com/netdata/netdata) (health monitor).
 
 It's part of the [uServer](https://github.com/users/ferdn4ndo/projects/1) stack project.
 
 
 ### Prepare the environment
 
-Copy both `adminer/.env.template` and `postgres/.env.template` to `adminer/.env` and `postgres/.env` (respectively) and edit them accordingly.
+Copy the environment templates:
+
+```
+cp chronos/.env.template chronos/.env
+cp letsencrypt/.env.template letsencrypt/.env
+cp monitor/.env.template monitor/.env
+```
+
+Then edit them accordingly.
 
 ### Run the Application
 
