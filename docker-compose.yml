@@ -45,6 +45,8 @@ services:
     build:
       context: ./monitor
       dockerfile: Dockerfile
+    logging:
+      driver: none
     env_file:
       - monitor/.env
     expose:
