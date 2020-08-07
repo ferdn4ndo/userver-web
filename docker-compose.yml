@@ -32,15 +32,6 @@ services:
       - ./nginx/logs:/var/log/nginx/
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  userver-chronos:
-    image: twistify/crontab-ui
-    container_name: userver-chronos
-    restart: unless-stopped
-    env_file:
-      - chronos/.env
-    volumes:
-      - ./chronos/crontabs:/usr/lib/node_modules/crontab-ui/crontabs
-
   userver-monitor:
     container_name: userver-monitor
     restart: unless-stopped

@@ -1,6 +1,6 @@
 # uServer Web
 
-Web server microservices stack based on [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) (DNS reverse proxy), [letsencrypt-nginx-proxy-companion](https://github.com/nginx-proxy/docker-letsencrypt-nginx-proxy-companion) (SSL support and auto-renewal), [crontab-ui](https://github.com/alseambusher/crontab-ui) (cronjob management), and [netdata](https://github.com/netdata/netdata) (health monitor).
+Web server microservices stack based on [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) (DNS reverse proxy), [letsencrypt-nginx-proxy-companion](https://github.com/nginx-proxy/docker-letsencrypt-nginx-proxy-companion) (SSL support and auto-renewal), and [netdata](https://github.com/netdata/netdata) (health monitor).
 
 It's part of the [uServer](https://github.com/users/ferdn4ndo/projects/1) stack project.
 
@@ -10,7 +10,6 @@ It's part of the [uServer](https://github.com/users/ferdn4ndo/projects/1) stack 
 Copy the environment templates:
 
 ```
-cp chronos/.env.template chronos/.env
 cp letsencrypt/.env.template letsencrypt/.env
 cp monitor/.env.template monitor/.env
 ```
