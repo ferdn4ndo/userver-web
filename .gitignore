@@ -7,16 +7,13 @@ tmp
 chronos/crontabs/*
 !chronos/crontabs/.gitkeep
 
-nginx/certs/*
-!nginx/certs/.gitkeep
+nginx-firewall/http-confs/*
+!nginx-firewall/http-confs/.gitkeep
 
-nginx/conf/default.conf
+nginx-proxy/conf/default.conf
 
-nginx/html/*
-!nginx/html/.gitkeep
-
-nginx/logs/*
-!nginx/logs/.gitkeep
+nginx-proxy/logs/*
+!nginx-proxy/logs/.gitkeep
 
 *.pyc
 *.sqlite
