@@ -15,6 +15,9 @@ nginx-proxy/conf/default.conf
 nginx-proxy/logs/*
 !nginx-proxy/logs/.gitkeep
 
+certs/*
+!certs/.gitkeep
+
 *.pyc
 *.sqlite
 *.coverage

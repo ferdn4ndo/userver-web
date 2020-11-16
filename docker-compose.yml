@@ -70,5 +70,10 @@ volumes:
   netdata-lib:
   netdata-cache:
   nginx-certs:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./certs
   nginx-vhost:
   nginx-html:
