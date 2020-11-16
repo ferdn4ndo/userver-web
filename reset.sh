@@ -2,5 +2,5 @@
 
 sudo rm ./certs/*.crt ./certs/*.key ./certs/*.pem
 
-sudo rm ./conf/default.conf
+sudo rm ./nginx-proxy/conf/default.conf
 

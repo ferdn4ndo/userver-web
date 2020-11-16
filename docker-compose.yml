@@ -1,35 +1,35 @@
 version: '3'
 services:
-  # userver-nginx-firewall:
-  #   container_name: userver-nginx-firewall
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./nginx-firewall
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - nginx-firewall/.env
-  #   ports:
-  #     - "80:8080"
-  #     - "443:8443"
-  #   volumes:
-  #     - nginx-certs:/etc/letsencrypt
-  #     - ./nginx-firewall/server-confs:/server-confs
-  #     - ./nginx-firewall/http-confs:/http-confs
-  #     - ./nginx-firewall/hosts.txt:/hosts.txt
+  userver-nginx-firewall:
+    container_name: userver-nginx-firewall
+    restart: unless-stopped
+    build:
+      context: ./nginx-firewall
+      dockerfile: Dockerfile
+    env_file:
+      - nginx-firewall/.env
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - ./certs:/etc/letsencrypt
+      - ./nginx-firewall/server-confs:/server-confs
+      - ./nginx-firewall/http-confs:/http-confs
+      - ./nginx-firewall/hosts.txt:/hosts.txt
 
   userver-nginx-proxy:
     container_name: userver-nginx-proxy
     restart: unless-stopped
     image: jwilder/nginx-proxy
-    # expose:
-    #   - 80
-    #   - 443
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - 80
+      - 443
+    # ports:
+    #   - "80:80"
+    #   - "443:443"
     volumes:
-      - ./nginx-proxy/certs:/etc/nginx/certs
-      - ./nginx-proxy/vhost:/etc/nginx/vhost.d
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
       - nginx-html:/usr/share/nginx/html
       - ./nginx-proxy/nginx.tmpl:/app/nginx.tmpl
       - ./nginx-proxy/conf:/etc/nginx/conf.d/
@@ -47,8 +47,8 @@ services:
     env_file:
       - letsencrypt/.env
     volumes:
-      - ./nginx-proxy/certs:/etc/nginx/certs
-      - ./nginx-proxy/vhost:/etc/nginx/vhost.d
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
       - nginx-html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
