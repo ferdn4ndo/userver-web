@@ -18,6 +18,9 @@ nginx-proxy/logs/*
 certs/*
 !certs/.gitkeep
 
+vhost/*
+!vhost/.gitkeep
+
 *.pyc
 *.sqlite
 *.coverage
