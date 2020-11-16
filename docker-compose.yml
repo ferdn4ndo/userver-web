@@ -1,21 +1,21 @@
 version: '3'
 services:
-  userver-nginx-firewall:
-    # container_name: userver-nginx-firewall
-    # restart: unless-stopped
-    # build:
-    #   context: ./nginx-firewall
-    #   dockerfile: Dockerfile
-    # env_file:
-    #   - nginx-firewall/.env
-    # ports:
-    #   - "80:8080"
-    #   - "443:8443"
-    # volumes:
-    #   - ./certs:/etc/letsencrypt
-    #   - ./nginx-firewall/server-confs:/server-confs
-    #   - ./nginx-firewall/http-confs:/http-confs
-    #   - ./nginx-firewall/hosts.txt:/hosts.txt
+  # userver-nginx-firewall:
+  #   container_name: userver-nginx-firewall
+  #   restart: unless-stopped
+  #   build:
+  #     context: ./nginx-firewall
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - nginx-firewall/.env
+  #   ports:
+  #     - "80:8080"
+  #     - "443:8443"
+  #   volumes:
+  #     - ./certs:/etc/letsencrypt
+  #     - ./nginx-firewall/server-confs:/server-confs
+  #     - ./nginx-firewall/http-confs:/http-confs
+  #     - ./nginx-firewall/hosts.txt:/hosts.txt
 
   userver-nginx-proxy:
     container_name: userver-nginx-proxy
