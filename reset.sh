@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-sudo rm ./certs/*.crt ./certs/*.key ./certs/*.pem
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-sudo rm ./nginx-proxy/conf/default.conf
+sudo rm "$DIR/certs/*.crt" "$DIR/certs/*.key" "$DIR/certs/*.pem"
+
+sudo rm "$DIR/nginx-proxy/conf/default.conf"
 

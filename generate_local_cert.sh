@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "WARNING: This script will generate a self-signed certificate to be used by nginx to serve HTTPS under local environment."
 read -p "Continue (y/n)?" CONT
