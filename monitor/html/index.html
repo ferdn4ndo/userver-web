@@ -1,0 +1,57 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>uServer Monitor</title>
+  <meta name="description" content="A website for monitoring the uServer microservices enviroment.">
+  <meta name="author" content="SitePoint">
+
+  <meta property="og:title" content="uServer Monitor">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.sitepoint.com/a-basic-html5-template/">
+  <meta property="og:description" content="A website for monitoring the uServer microservices enviroment.">
+  <meta property="og:image" content="static/site_thumbnail.png">
+
+  <link rel="icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&family=Poppins&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/styles.css?v=1.0">
+</head>
+
+<body>
+  <header>
+    <h1 class="title">uServer Health Monitoring</h1>
+
+    <div class="refreshOptions">
+      <label for="refreshSecondsSelect">Refresh every</label>
+
+      <select class="refreshSelect" id="refreshSecondsSelect">
+        <option value="5">5 seconds</option>
+        <option value="10">10 seconds</option>
+        <option value="15">15 seconds</option>
+        <option value="30">30 seconds</option>
+        <option value="60">1 minute</option>
+        <option value="300">5 minutes</option>
+        <option value="600">10 minutes</option>
+        <option value="1800">30 minutes</option>
+        <option value="3600">1 hour</option>
+      </select>
+    </div>
+  </header>
+
+  <pre id="heartbeatBox" class="heartbeat">
+    Loading last heartbeat...
+  </pre>
+
+  <p class="countdown" id="countdown">Data will be updated again soon...</p>
+
+  <script src="/static/main.js"></script>
+</body>
+</html>
