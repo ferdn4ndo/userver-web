@@ -54,6 +54,21 @@ services:
       - nginx-html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
+  userver-monitor:
+    container_name: userver-monitor
+    restart: unless-stopped
+    build:
+      context: monitor
+      dockerfile: Dockerfile
+    env_file:
+      - ./monitor/.env
+    volumes:
+      - ./monitor/html:/usr/share/nginx/html
+      - ./monitor/default.conf:/etc/nginx/conf.d/default.conf
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - 80
+
   userver-whoami:
     container_name: userver-whoami
     restart: unless-stopped
