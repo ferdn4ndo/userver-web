@@ -4,9 +4,8 @@ now=$(date +'%m/%d/%Y %H:%M:%S')
 docker_version=$(docker -v)
 disk_usage=$(df -h /)
 docker_stats=$(docker stats --no-stream --all)
-FILE=/usr/share/nginx/html/stats.txt
 
-cat > $FILE <<- EOM
+cat > "$STATS_FILE" <<- EOM
 HEARTBEAT LOG AT $now
 
 ================================================
