@@ -22,9 +22,9 @@ header {
   display: inline-block;
 }
 
-.countdown {
+.status {
   margin-right: 10px;
-  font-size: 12pt;
+  font-size: 10pt;
   text-align: right;
 }
 
