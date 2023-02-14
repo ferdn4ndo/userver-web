@@ -1,31 +1,10 @@
 version: '3'
 services:
-  # userver-nginx-firewall:
-  #   container_name: userver-nginx-firewall
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./nginx-firewall
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - nginx-firewall/.env
-  #   ports:
-  #     - "80:8080"
-  #     - "443:8443"
-  #   volumes:
-  #     - ./certs:/etc/letsencrypt
-  #     - ./nginx-firewall/server-confs:/server-confs
-  #     - ./nginx-firewall/http-confs:/http-confs
-  #     - ./nginx-firewall/hosts.txt:/hosts.txt
-
   userver-nginx-proxy:
     container_name: userver-nginx-proxy
-    restart: unless-stopped
-    image: jwilder/nginx-proxy
+    image: jwilder/nginx-proxy:1.2-alpine
     env_file:
       - nginx-proxy/.env
-    # expose:
-    #   - 80
-    #   - 443
     ports:
       - "80:80"
       - "443:443"
@@ -42,8 +21,7 @@ services:
 
   userver-letsencrypt:
     container_name: userver-letsencrypt
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    restart: unless-stopped
+    image: nginxproxy/acme-companion:2.2
     depends_on:
       - userver-nginx-proxy
     env_file:
@@ -56,7 +34,6 @@ services:
 
   userver-monitor:
     container_name: userver-monitor
-    restart: unless-stopped
     build:
       context: monitor
       dockerfile: Dockerfile
@@ -71,8 +48,7 @@ services:
 
   userver-whoami:
     container_name: userver-whoami
-    restart: unless-stopped
-    image: traefik/whoami
+    image: traefik/whoami:v1.8
     expose:
       - 80
     env_file:
@@ -80,8 +56,8 @@ services:
 
 networks:
   default:
-    external:
-      name: nginx-proxy
+    name: nginx-proxy
+    external: true
 
 volumes:
   netdata-config:

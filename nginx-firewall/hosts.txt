@@ -1,9 +1,0 @@
-fconstantino.lan
-userver.lan
-adminer.userver.lan
-auth.userver.lan
-filemgr.userver.lan
-mail.userver.lan
-monitor.userver.lan
-webmail.userver.lan
-whoami.userver.lan
