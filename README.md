@@ -4,19 +4,20 @@ Web server microservices stack based on [nginx-proxy](https://github.com/nginx-p
 
 It's part of the [uServer](https://github.com/users/ferdn4ndo/projects/1) stack project.
 
+## How to use it?
 
-### Prepare the environment
+### 1 - Prepare the environment
 
 Copy the environment templates:
 
-```
+```sh
 cp letsencrypt/.env.template letsencrypt/.env
 cp monitor/.env.template monitor/.env
 ```
 
 Then edit them accordingly.
 
-### Run the Application
+### 2 - Run the Application
 
 ```sh
 docker-compose up --build
