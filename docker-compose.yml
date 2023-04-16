@@ -2,7 +2,7 @@ version: '3'
 services:
   userver-nginx-proxy:
     container_name: userver-nginx-proxy
-    image: jwilder/nginx-proxy:1.2-alpine
+    image: nginxproxy/nginx-proxy:1.2-alpine
     env_file:
       - nginx-proxy/.env
     ports:
@@ -10,11 +10,11 @@ services:
       - "443:443"
     volumes:
       - ./certs:/etc/nginx/certs
-      - ./vhost:/etc/nginx/vhost.d
-      - nginx-html:/usr/share/nginx/html
-      - ./nginx-proxy/nginx.tmpl:/app/nginx.tmpl
       - ./nginx-proxy/conf:/etc/nginx/conf.d/
       - ./nginx-proxy/logs:/var/log/nginx/
+      - ./nginx-proxy/nginx.tmpl:/app/nginx.tmpl
+      - nginx-vhost:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
     labels:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
@@ -28,23 +28,17 @@ services:
       - letsencrypt/.env
     volumes:
       - ./certs:/etc/nginx/certs
-      - ./vhost:/etc/nginx/vhost.d
+      - nginx-vhost:/etc/nginx/vhost.d
       - nginx-html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   userver-monitor:
     container_name: userver-monitor
-    build:
-      context: monitor
-      dockerfile: Dockerfile
+    image: ferdn4ndo/docker-containers-monitor:1.0.0
     env_file:
       - ./monitor/.env
     volumes:
-      - ./monitor/html:/usr/share/nginx/html
-      - ./monitor/default.conf:/etc/nginx/conf.d/default.conf
       - /var/run/docker.sock:/var/run/docker.sock
-    expose:
-      - 80
 
   userver-whoami:
     container_name: userver-whoami
@@ -60,8 +54,5 @@ networks:
     external: true
 
 volumes:
-  netdata-config:
-  netdata-lib:
-  netdata-cache:
   nginx-vhost:
   nginx-html:
