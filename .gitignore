@@ -4,13 +4,7 @@ venv
 temp
 tmp
 
-chronos/crontabs/*
-!chronos/crontabs/.gitkeep
-
 monitor/html/stats.txt
-
-nginx-firewall/http-confs/*
-!nginx-firewall/http-confs/.gitkeep
 
 nginx-proxy/conf/default.conf
 
