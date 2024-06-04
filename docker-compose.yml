@@ -2,7 +2,7 @@ version: '3'
 services:
   userver-nginx-proxy:
     container_name: userver-nginx-proxy
-    image: nginxproxy/nginx-proxy:1.2-alpine
+    image: nginxproxy/nginx-proxy:1.5-alpine
     env_file:
       - nginx-proxy/.env
     ports:
@@ -21,7 +21,7 @@ services:
 
   userver-letsencrypt:
     container_name: userver-letsencrypt
-    image: nginxproxy/acme-companion:2.2
+    image: nginxproxy/acme-companion:2.3
     depends_on:
       - userver-nginx-proxy
     env_file:
@@ -34,7 +34,7 @@ services:
 
   userver-monitor:
     container_name: userver-monitor
-    image: ferdn4ndo/docker-containers-monitor:1.0.0
+    image: ferdn4ndo/docker-containers-monitor:1.0.1
     env_file:
       - ./monitor/.env
     volumes:
@@ -42,7 +42,7 @@ services:
 
   userver-whoami:
     container_name: userver-whoami
-    image: traefik/whoami:v1.8
+    image: traefik/whoami:v1.10
     expose:
       - 80
     env_file:
