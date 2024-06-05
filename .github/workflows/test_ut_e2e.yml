@@ -43,6 +43,11 @@ jobs: # Docs: <https://git.io/JvxXE>
           sudo cat /etc/hosts
         shell: bash
 
+      - name: Create the docker network
+        run: >
+          docker network create nginx-proxy
+        shell: bash
+
       - name: Try to run containers
         run: >
           docker compose up -d --build --remove-orphans
