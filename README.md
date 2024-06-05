@@ -1,6 +1,6 @@
 # uServer Web
 
-[![E2E test status](https://github.com/ferdn4ndo/userver-web/actions/workflows/test_ut_e2e.yml/badge.svg?branch=main)](https://github.com/ferdn4ndo/userver-web/actions)
+[![E2E test status](https://github.com/ferdn4ndo/userver-web/actions/workflows/test_e2e.yml/badge.svg?branch=main)](https://github.com/ferdn4ndo/userver-web/actions)
 [![GitLeaks test status](https://github.com/ferdn4ndo/userver-web/actions/workflows/test_code_leaks.yml/badge.svg?branch=main)](https://github.com/ferdn4ndo/userver-web/actions)
 [![ShellCheck test status](https://github.com/ferdn4ndo/userver-web/actions/workflows/test_code_quality.yml/badge.svg?branch=main)](https://github.com/ferdn4ndo/userver-web/actions)
 [![Release](https://img.shields.io/github/v/release/ferdn4ndo/userver-web)](https://github.com/ferdn4ndo/userver-web/releases)
