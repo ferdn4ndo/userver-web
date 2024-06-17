@@ -1,12 +1,12 @@
 ########################################################################################
 # Composite action for deployment of the uServer-Web services locally                  #
 #--------------------------------------------------------------------------------------#
-# Requirement: actions/checkout@v3 in this repo                                        #
+# Requirement: actions/checkout@v4 in this repo                                        #
 #                                                                                      #
 # Usage in workflows steps:                                                            #
 #                                                                                      #
 #      - name: Build and deploy uServer Web services                                   #
-#        uses: ./.github/actions/deploy_userver_web                                    #
+#        uses: ./.github/actions/deploy_local                                          #
 #        with:                                                                         #
 #          monitor-virtual-host: "monitor.userver.lan"                                 #
 #          whoami-virtual-host: "whoami.userver.lan"                                   #
@@ -54,6 +54,7 @@ runs:
           MONITOR_VIRTUAL_HOST: "${{ inputs.monitor-virtual-host }}"
           WHOAMI_VIRTUAL_HOST: "${{ inputs.whoami-virtual-host }}"
         run: |
+          sudo echo -e "\n# uServer-Web local services" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 ${{ env.MONITOR_VIRTUAL_HOST }}" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 ${{ env.WHOAMI_VIRTUAL_HOST }}" | sudo tee -a /etc/hosts
           echo "== HOSTS FILE CONTENT =="
@@ -75,6 +76,7 @@ runs:
         shell: bash
 
       - name: Verify if the service URLs are up
+        env:
           MONITOR_URL: "http://${{ inputs.monitor-virtual-host }}"
           WHOAMI_URL: "http://${{ inputs.whoami-virtual-host }}"
         run: |
