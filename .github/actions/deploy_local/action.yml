@@ -78,7 +78,10 @@ runs:
       shell: bash
 
     - name: Try to run containers
-      run: >
+      env:
+        ROOT_WORK_DIR: "${{ inputs.root-work-dir }}"
+      run: |
+        cd "$ROOT_WORK_DIR"
         docker compose up --build --remove-orphans --detach --wait --wait-timeout 30
       shell: bash
 
