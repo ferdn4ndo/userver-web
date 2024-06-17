@@ -1,0 +1,87 @@
+########################################################################################
+# Composite action for deployment of the uServer-Web services locally                  #
+#--------------------------------------------------------------------------------------#
+# Requirement: actions/checkout@v4 in this repo                                        #
+#                                                                                      #
+# Usage in workflows steps:                                                            #
+#                                                                                      #
+#      - name: Build and deploy uServer Web services                                   #
+#        uses: ./.github/actions/deploy_local                                          #
+#        with:                                                                         #
+#          monitor-virtual-host: "monitor.userver.lan"                                 #
+#          whoami-virtual-host: "whoami.userver.lan"                                   #
+########################################################################################
+
+name: "Container building and deployment"
+description: "Build a docker image and send it to ECS and trigger the deployment to EKS"
+inputs:
+  monitor-virtual-host:
+    description: "The hostname (VIRTUAL_HOST) of the uServer-Monitor service."
+    required: true
+    default: "monitor.userver.lan"
+  whoami-virtual-host:
+    description: "The hostname (VIRTUAL_HOST) of the uServer-WhoAmI service."
+    required: true
+    default: "whoami.userver.lan"
+runs:
+  using: "composite"
+  steps:
+      - name: Prepare the environment
+        env:
+          MONITOR_VIRTUAL_HOST: "${{ inputs.monitor-virtual-host }}"
+          WHOAMI_VIRTUAL_HOST: "${{ inputs.whoami-virtual-host }}"
+        run: |
+          echo "== LETSENCRYPT ENV =="
+          cp ./letsencrypt/.env.template ./letsencrypt/.env
+          cat ./letsencrypt/.env
+
+          echo "== MONITOR ENV =="
+          cp ./monitor/.env.template ./monitor/.env
+          sed -i 's#VIRTUAL_HOST=#VIRTUAL_HOST=${{ env.MONITOR_VIRTUAL_HOST }}#g' ./monitor/.env
+          cat ./monitor/.env
+
+          echo "== NGINX-PROXY ENV =="
+          cp ./nginx-proxy/.env.template ./nginx-proxy/.env
+          cat ./nginx-proxy/.env
+
+          echo "== WHOAMI ENV =="
+          cp ./whoami/.env.template ./whoami/.env
+          sed -i 's/VIRTUAL_HOST=/VIRTUAL_HOST=${{ env.WHOAMI_VIRTUAL_HOST }}/g' ./whoami/.env
+        shell: bash
+
+      - name: Add hosts to /etc/hosts
+        env:
+          MONITOR_VIRTUAL_HOST: "${{ inputs.monitor-virtual-host }}"
+          WHOAMI_VIRTUAL_HOST: "${{ inputs.whoami-virtual-host }}"
+        run: |
+          sudo echo -e "\n# uServer-Web local services" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 ${{ env.MONITOR_VIRTUAL_HOST }}" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 ${{ env.WHOAMI_VIRTUAL_HOST }}" | sudo tee -a /etc/hosts
+          echo "== HOSTS FILE CONTENT =="
+          sudo cat /etc/hosts
+        shell: bash
+
+      - name: Create the docker network if not exists
+        env:
+          NETWORK_NAME: "nginx-proxy"
+        run: |
+          if [ -z $(docker network ls --filter name=^${NETWORK_NAME}$ --format="{{ .Name }}") ] ; then
+              docker network create ${NETWORK_NAME} ;
+          fi
+        shell: bash
+
+      - name: Try to run containers
+        run: >
+          docker compose up --build --remove-orphans --detach --wait --wait-timeout 30
+        shell: bash
+
+      - name: Verify if the service URLs are up
+        env:
+          MONITOR_URL: "http://${{ inputs.monitor-virtual-host }}"
+          WHOAMI_URL: "http://${{ inputs.whoami-virtual-host }}"
+        run: |
+          echo "Testing uServer-Monitor at '${{ env.MONITOR_URL }}'"
+          curl --fail "${{ env.MONITOR_URL }}" || exit 1
+          echo "Testing uServer-Whoami at '${{ env.WHOAMI_URL }}'"
+          curl --fail "${{ env.WHOAMI_URL }}" || exit 1
+        shell: bash
