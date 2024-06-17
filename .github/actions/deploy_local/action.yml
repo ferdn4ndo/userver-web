@@ -10,6 +10,7 @@
 #        with:                                                                         #
 #          monitor-virtual-host: "monitor.userver.lan"                                 #
 #          whoami-virtual-host: "whoami.userver.lan"                                   #
+#          root-work-dir: "."                                                          #
 ########################################################################################
 
 name: "Container building and deployment"
@@ -23,6 +24,10 @@ inputs:
     description: "The hostname (VIRTUAL_HOST) of the uServer-WhoAmI service."
     required: true
     default: "whoami.userver.lan"
+  root-work-dir:
+    description: "The subfolder where the userver-web files are contained. Defaults to the current working directory."
+    required: false
+    default: "."
 runs:
   using: "composite"
   steps:
@@ -30,23 +35,25 @@ runs:
       env:
         MONITOR_VIRTUAL_HOST: "${{ inputs.monitor-virtual-host }}"
         WHOAMI_VIRTUAL_HOST: "${{ inputs.whoami-virtual-host }}"
+        ROOT_WORK_DIR: "${{ inputs.root-work-dir }}"
       run: |
         echo "== LETSENCRYPT ENV =="
-        cp ./letsencrypt/.env.template ./letsencrypt/.env
-        cat ./letsencrypt/.env
+        cp "${ROOT_WORK_DIR}/letsencrypt/.env.template" "${ROOT_WORK_DIR}/letsencrypt/.env"
+        cat "${ROOT_WORK_DIR}/letsencrypt/.env"
 
         echo "== MONITOR ENV =="
-        cp ./monitor/.env.template ./monitor/.env
-        sed -i 's#VIRTUAL_HOST=#VIRTUAL_HOST=${{ env.MONITOR_VIRTUAL_HOST }}#g' ./monitor/.env
-        cat ./monitor/.env
+        cp "${ROOT_WORK_DIR}/monitor/.env.template" "${ROOT_WORK_DIR}/monitor/.env"
+        sed -i 's#VIRTUAL_HOST=#VIRTUAL_HOST=${{ env.MONITOR_VIRTUAL_HOST }}#g' "${ROOT_WORK_DIR}/monitor/.env"
+        cat "${ROOT_WORK_DIR}/monitor/.env"
 
         echo "== NGINX-PROXY ENV =="
-        cp ./nginx-proxy/.env.template ./nginx-proxy/.env
-        cat ./nginx-proxy/.env
+        cp "${ROOT_WORK_DIR}/nginx-proxy/.env.template" "${ROOT_WORK_DIR}/nginx-proxy/.env"
+        cat "${ROOT_WORK_DIR}/nginx-proxy/.env"
 
         echo "== WHOAMI ENV =="
-        cp ./whoami/.env.template ./whoami/.env
-        sed -i 's/VIRTUAL_HOST=/VIRTUAL_HOST=${{ env.WHOAMI_VIRTUAL_HOST }}/g' ./whoami/.env
+        cp "${ROOT_WORK_DIR}/whoami/.env.template" "${ROOT_WORK_DIR}/whoami/.env"
+        sed -i 's/VIRTUAL_HOST=/VIRTUAL_HOST=${{ env.WHOAMI_VIRTUAL_HOST }}/g' "${ROOT_WORK_DIR}/whoami/.env"
+        cat "${ROOT_WORK_DIR}/whoami/.env"
       shell: bash
 
     - name: Add hosts to /etc/hosts
