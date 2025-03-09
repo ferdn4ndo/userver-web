@@ -7,20 +7,55 @@ on:
       - master
   pull_request:
 
-jobs: # Docs: <https://git.io/JvxXE>
-  run-ats:
-    name: Run the End-to-End (E2E) Automated Tests (AT)
-    runs-on: ubuntu-20.04
+jobs:
+  run-e2e-tests:
+    name: Run End-to-End (E2E) Tests
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Build and deploy uServer Web services
-        uses: ./.github/actions/deploy_local
-        with:
-          monitor-virtual-host: "monitor.userver.lan"
-          whoami-virtual-host: "whoami.userver.lan"
+      - name: Set up environment
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/userver.sh setup --monitor-host "monitor.userver.lan" --whoami-host "whoami.userver.lan"
+        shell: bash
 
-      - name: Run the End-to-End (E2E) tests
-        run: ./run_e2e_tests.sh
+      - name: Generate self-signed certificates
+        run: ./scripts/userver.sh certs generate --yes
+        shell: bash
+
+      - name: Update hosts file
+        run: |
+          sudo echo "127.0.0.1 monitor.userver.lan" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 whoami.userver.lan" | sudo tee -a /etc/hosts
+        shell: bash
+
+      - name: Create Docker network
+        run: docker network create nginx-proxy || true
+        shell: bash
+
+      - name: Start services
+        run: ./scripts/userver.sh start --build --detach
+        shell: bash
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 10
+          docker ps
+        shell: bash
+
+      - name: Run E2E tests
+        run: ./scripts/userver.sh test --e2e
+        shell: bash
+
+      - name: Show service logs on failure
+        if: failure()
+        run: docker-compose logs
+        shell: bash
+
+      - name: Stop services
+        if: always()
+        run: ./scripts/userver.sh stop
         shell: bash

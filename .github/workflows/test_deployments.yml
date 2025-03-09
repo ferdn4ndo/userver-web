@@ -1,0 +1,110 @@
+name: Deployment Tests
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  kubernetes-tests:
+    name: Kubernetes Deployment Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Install kind
+        run: |
+          go install sigs.k8s.io/kind@latest
+          kind version
+        shell: bash
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
+        shell: bash
+
+      - name: Install Helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+          helm version
+        shell: bash
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+        shell: bash
+
+      - name: Run Kubernetes tests
+        run: ./scripts/run_tests.sh --kubernetes
+        shell: bash
+
+  terraform-tests:
+    name: Terraform Deployment Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.5.7'
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+          aws --version
+        shell: bash
+
+      - name: Install LocalStack
+        run: |
+          pip install localstack
+          localstack --version
+        shell: bash
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+        shell: bash
+
+      - name: Run Terraform tests
+        run: ./scripts/run_tests.sh --terraform
+        shell: bash
+
+  helm-lint:
+    name: Helm Chart Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+          helm version
+        shell: bash
+
+      - name: Lint Helm chart
+        run: |
+          helm lint ./helm/userver-web
+        shell: bash
+
+      - name: Validate Helm chart
+        run: |
+          helm template ./helm/userver-web
+        shell: bash

@@ -1,0 +1,48 @@
+version: '3'
+
+# This is an example override file for docker-compose.yml
+# Copy this file to docker-compose.override.yml and customize it as needed
+# The docker-compose.override.yml file is automatically loaded by docker-compose
+# and will override the settings in docker-compose.yml
+
+services:
+  # Example: Override the nginx-proxy service
+  userver-nginx-proxy:
+    # Example: Add additional ports
+    ports:
+      - "8080:80"
+      - "8443:443"
+    # Example: Add additional volumes
+    volumes:
+      - ./custom-nginx-config:/etc/nginx/custom-conf/
+
+  # Example: Override the monitor service
+  userver-monitor:
+    # Example: Set custom environment variables
+    environment:
+      - REFRESH_EVERY_SECONDS=10
+    # Example: Add additional volumes
+    volumes:
+      - ./custom-monitor-config:/app/custom-config/
+
+  # Example: Add a new service
+  userver-custom-service:
+    image: nginx:alpine
+    container_name: userver-custom-service
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST=custom.userver.lan
+      - LETSENCRYPT_HOST=custom.userver.lan
+      - LETSENCRYPT_EMAIL=admin@example.com
+    volumes:
+      - ./custom-service/html:/usr/share/nginx/html
+
+# Example: Add a custom network
+networks:
+  custom-network:
+    driver: bridge
+
+# Example: Add a custom volume
+volumes:
+  custom-data:

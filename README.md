@@ -10,33 +10,242 @@ Web server microservices stack based on [nginx-proxy](https://github.com/nginx-p
 
 It's part of the [uServer](https://github.com/users/ferdn4ndo/projects/1) stack project.
 
-## How to use it?
+## Table of Contents
 
-### 1 - Prepare the environment
+- [Features](#features)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+  - [Setup Environment](#setup-environment)
+  - [Certificate Management](#certificate-management)
+  - [Running Services](#running-services)
+  - [Testing](#testing)
+  - [Upgrading](#upgrading)
+- [Deployment Options](#deployment-options)
+  - [Docker Compose](#docker-compose)
+  - [Terraform (AWS)](#terraform-aws)
+  - [Kubernetes (Helm)](#kubernetes-helm)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
-Copy the environment templates:
+## Features
 
-```sh
-cp letsencrypt/.env.template letsencrypt/.env
-cp monitor/.env.template monitor/.env
-cp nginx-proxy/.env.template nginx-proxy/.env
-cp whoami/.env.template whoami/.env
-```
+- **Reverse Proxy**: Nginx-based reverse proxy for routing requests to appropriate services
+- **SSL Support**: Automatic SSL certificate generation and renewal via Let's Encrypt
+- **Container Monitoring**: Lightweight resource usage monitoring for all containers
+- **Health Checking**: Basic health check endpoint via the 'Who Am I?' service
+- **Comprehensive Testing**: Unit, integration, and end-to-end tests
+- **Easy Management**: Unified command-line interface for all operations
+- **Multiple Deployment Options**: Support for Docker Compose, Terraform (AWS), and Kubernetes (Helm)
 
-Then edit them accordingly. To play locally as-is, the only missing values are the hosts (`VIRTUAL_HOST`) on both `monitor/.env` and `whoami/.env` files. Remember to redirect them to `127.0.0.1` on your OS hosts file too.
+## Architecture
 
-Example: assume that you want to expose the `userver-monitor` container output on `monitor.userver.lan`, make sure to set `VIRTUAL_HOST=monitor.userver.lan` in the `monitor/.env` file and then run:
+The uServer-Web stack consists of the following components:
+
+- **userver-nginx-proxy**: Reverse proxy based on nginx for routing requests
+- **userver-letsencrypt**: SSL certificate management via Let's Encrypt
+- **userver-monitor**: Container resource usage monitoring
+- **userver-whoami**: Basic health checking service
+
+For a detailed architecture overview, see the [Architecture Documentation](docs/architecture.md).
+
+## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Bash shell
+- OpenSSL (for certificate generation)
+
+For other deployment options, additional prerequisites may apply. See the [Deployment Options](#deployment-options) section.
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-sudo echo "127.0.0.1 monitor.userver.lan" | sudo tee -a /etc/hosts
+git clone https://github.com/ferdn4ndo/userver-web.git
+cd userver-web
 ```
 
-Or edit the `/etc/hosts` manually.
+2. Set up the environment:
 
-You will have to do the same for the `userver-whoami` domain, setting `VIRTUAL_HOST=whoami.userver.lan` in the `whoami/.env` file and then adding `whoami.userver.lan` to the OS hosts file.
-
-### 2 - Run the Application
-
-```sh
-docker-compose up --build
+```bash
+./scripts/userver.sh setup
 ```
+
+This will create the necessary environment files with default settings.
+
+## Usage
+
+### Setup Environment
+
+The setup script provides options for configuring the environment:
+
+```bash
+./scripts/userver.sh setup --help
+```
+
+Example with custom domain names:
+
+```bash
+./scripts/userver.sh setup --monitor-host monitor.example.com --whoami-host whoami.example.com --update-hosts
+```
+
+### Certificate Management
+
+Generate self-signed certificates for local development:
+
+```bash
+./scripts/userver.sh certs generate
+```
+
+Generate certificates for specific domains:
+
+```bash
+./scripts/userver.sh certs generate --domain example.com --domain api.example.com
+```
+
+Reset certificates:
+
+```bash
+./scripts/userver.sh certs reset
+```
+
+### Running Services
+
+Start services:
+
+```bash
+./scripts/userver.sh start
+```
+
+Start services in detached mode with build:
+
+```bash
+./scripts/userver.sh start --detach --build
+```
+
+Stop services:
+
+```bash
+./scripts/userver.sh stop
+```
+
+Restart services:
+
+```bash
+./scripts/userver.sh restart
+```
+
+Check service status:
+
+```bash
+./scripts/userver.sh status
+```
+
+### Testing
+
+Run all tests:
+
+```bash
+./scripts/userver.sh test
+```
+
+Run specific test types:
+
+```bash
+./scripts/userver.sh test --unit-tests
+./scripts/userver.sh test --integration
+./scripts/userver.sh test --e2e
+./scripts/userver.sh test --shellcheck
+```
+
+### Upgrading
+
+Upgrade the stack to the latest version:
+
+```bash
+./scripts/userver.sh upgrade
+```
+
+Create a backup before upgrading:
+
+```bash
+./scripts/userver.sh upgrade --backup
+```
+
+Only pull the latest images without restarting:
+
+```bash
+./scripts/userver.sh upgrade --pull-only
+```
+
+## Deployment Options
+
+### Docker Compose
+
+The default deployment option is Docker Compose, which is suitable for local development and small production environments.
+
+```bash
+./scripts/userver.sh start --detach --build
+```
+
+For more information, see the [Usage](#usage) section.
+
+### Terraform (AWS)
+
+For deploying to AWS, you can use the provided Terraform configuration:
+
+```bash
+cd terraform
+terraform init
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your configuration
+terraform apply
+```
+
+For more information, see the [Terraform README](terraform/README.md).
+
+### Kubernetes (Helm)
+
+For deploying to Kubernetes, you can use the provided Helm chart:
+
+```bash
+helm install my-release ./helm/userver-web
+```
+
+For more information, see the [Helm Chart README](helm/userver-web/README.md).
+
+## Development
+
+The project follows SOLID principles and aims for high test coverage. The codebase is organized as follows:
+
+- **scripts/**: Management scripts for setup, testing, and service control
+- **nginx-proxy/**: Nginx proxy configuration
+- **letsencrypt/**: Let's Encrypt configuration
+- **monitor/**: Container monitoring configuration
+- **whoami/**: Health check service configuration
+- **certs/**: SSL certificates storage
+- **terraform/**: Terraform configuration for AWS deployment
+- **helm/**: Helm chart for Kubernetes deployment
+- **docs/**: Detailed documentation
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+For more information, see the [Contributing Guidelines](CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

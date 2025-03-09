@@ -17,8 +17,22 @@ certs/*
 vhost/*
 !vhost/.gitkeep
 
+# Docker Compose override file (should be customized per environment)
+docker-compose.override.yml
+
+# Backups
+backups/
+
+# Test artifacts
+.coverage
+coverage/
+test-results/
+
+# OS and IDE files
 *.pyc
 *.sqlite
-*.coverage
 .DS_Store
 *.idea
+.vscode/
+*.swp
+*~

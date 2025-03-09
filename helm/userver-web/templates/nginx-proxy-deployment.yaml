@@ -1,0 +1,91 @@
+{{- if .Values.nginxProxy.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "userver-web.fullname" . }}-nginx-proxy
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nginx-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "userver-web.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: nginx-proxy
+  template:
+    metadata:
+      labels:
+        {{- include "userver-web.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: nginx-proxy
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "userver-web.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: nginx-proxy
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.nginxProxy.image.repository }}:{{ .Values.nginxProxy.image.tag }}"
+          imagePullPolicy: {{ .Values.nginxProxy.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          env:
+            - name: HTTPS_METHOD
+              value: "redirect"
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/nginx/certs
+            - name: conf
+              mountPath: /etc/nginx/conf.d/
+            - name: logs
+              mountPath: /var/log/nginx/
+            - name: vhost
+              mountPath: /etc/nginx/vhost.d
+            - name: html
+              mountPath: /usr/share/nginx/html
+            - name: client-max-body-size
+              mountPath: /etc/nginx/conf.d/client_max_body_size.conf
+              subPath: client_max_body_size.conf
+          resources:
+            {{- toYaml .Values.nginxProxy.resources | nindent 12 }}
+      volumes:
+        - name: certs
+          {{- if .Values.nginxProxy.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "userver-web.fullname" . }}-certs
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: conf
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        - name: vhost
+          emptyDir: {}
+        - name: html
+          emptyDir: {}
+        - name: client-max-body-size
+          configMap:
+            name: {{ include "userver-web.fullname" . }}-nginx-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

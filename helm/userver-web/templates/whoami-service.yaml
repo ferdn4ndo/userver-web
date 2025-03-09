@@ -1,0 +1,19 @@
+{{- if .Values.whoami.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "userver-web.fullname" . }}-whoami
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: whoami
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.whoami.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "userver-web.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: whoami
+{{- end }}

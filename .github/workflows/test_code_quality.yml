@@ -7,19 +7,52 @@ on:
       - master
   pull_request:
 
-jobs: # Docs: <https://git.io/JvxXE>
-  check-codebase-quality:
-    name: Check codebase quality with ShellCheck
-    runs-on: ubuntu-20.04
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out code into the Go module directory
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Run ShellCheck with ReviewDog
-        uses: reviewdog/action-shellcheck@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          path: "." # Optional.
-          pattern: "*.sh" # Optional.
-          exclude: "./.git/*" # Optional.
-          check_all_files_with_shebangs: "false" # Optional.
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+        shell: bash
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+        shell: bash
+
+      - name: Run ShellCheck tests
+        run: ./scripts/userver.sh test --shellcheck
+        shell: bash
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+        shell: bash
+
+      - name: Run unit tests
+        run: ./scripts/userver.sh test --unit-tests
+        shell: bash
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+        shell: bash
+
+      - name: Run integration tests
+        run: ./scripts/userver.sh test --integration
+        shell: bash

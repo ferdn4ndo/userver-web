@@ -1,0 +1,17 @@
+apiVersion: v2
+name: userver-web
+description: A Helm chart for uServer-Web stack
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - nginx-proxy
+  - letsencrypt
+  - monitoring
+  - web
+maintainers:
+  - name: ferdn4ndo
+    url: https://github.com/ferdn4ndo
+home: https://github.com/ferdn4ndo/userver-web
+sources:
+  - https://github.com/ferdn4ndo/userver-web

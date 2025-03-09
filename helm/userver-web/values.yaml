@@ -1,0 +1,167 @@
+# Default values for userver-web.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global settings
+global:
+  # Domain settings
+  domain:
+    # Base domain for all services
+    base: "example.com"
+    # Subdomain for monitor service
+    monitor: "monitor"
+    # Subdomain for whoami service
+    whoami: "whoami"
+
+  # TLS settings
+  tls:
+    # Enable TLS
+    enabled: true
+    # Use cert-manager for TLS certificates
+    certManager:
+      enabled: true
+      # Issuer to use for certificates
+      issuer: "letsencrypt-prod"
+    # Secret name for TLS certificates (if not using cert-manager)
+    secretName: ""
+
+# Nginx Proxy settings
+nginxProxy:
+  # Enable nginx-proxy
+  enabled: true
+  # Image settings
+  image:
+    repository: "nginxproxy/nginx-proxy"
+    tag: "1.5-alpine"
+    pullPolicy: "IfNotPresent"
+  # Resource settings
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  # Service settings
+  service:
+    type: "LoadBalancer"
+    port: 80
+    httpsPort: 443
+    annotations: {}
+  # Configuration settings
+  config:
+    clientMaxBodySize: "1g"
+  # Persistence settings
+  persistence:
+    enabled: true
+    size: "1Gi"
+    storageClass: ""
+    accessMode: "ReadWriteOnce"
+
+# Let's Encrypt settings
+letsencrypt:
+  # Enable letsencrypt
+  enabled: true
+  # Image settings
+  image:
+    repository: "nginxproxy/acme-companion"
+    tag: "2.3"
+    pullPolicy: "IfNotPresent"
+  # Resource settings
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  # Configuration settings
+  config:
+    email: "admin@example.com"
+  # Persistence settings
+  persistence:
+    enabled: true
+    size: "1Gi"
+    storageClass: ""
+    accessMode: "ReadWriteOnce"
+
+# Monitor settings
+monitor:
+  # Enable monitor
+  enabled: true
+  # Image settings
+  image:
+    repository: "ferdn4ndo/docker-containers-monitor"
+    tag: "1.0.1"
+    pullPolicy: "IfNotPresent"
+  # Resource settings
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  # Configuration settings
+  config:
+    refreshEverySeconds: 5
+    statsFile: "/usr/share/nginx/html/stats.txt"
+    fifoPath: "/tmp/userver_monitor"
+
+# Whoami settings
+whoami:
+  # Enable whoami
+  enabled: true
+  # Image settings
+  image:
+    repository: "traefik/whoami"
+    tag: "v1.10"
+    pullPolicy: "IfNotPresent"
+  # Resource settings
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+  # Service settings
+  service:
+    port: 80
+
+# Ingress settings
+ingress:
+  # Enable ingress
+  enabled: false
+  # Ingress class
+  className: "nginx"
+  # Annotations
+  annotations: {}
+  # Hosts
+  hosts: []
+  # TLS
+  tls: []
+
+# Service account settings
+serviceAccount:
+  # Create service account
+  create: true
+  # Annotations
+  annotations: {}
+  # Name
+  name: ""
+
+# Pod security context
+podSecurityContext: {}
+
+# Container security context
+securityContext: {}
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}
