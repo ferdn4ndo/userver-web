@@ -1,0 +1,54 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "userver-web.fullname" . -}}
+{{- $monitorDomain := include "userver-web.monitorDomain" . -}}
+{{- $whoamiDomain := include "userver-web.whoamiDomain" . -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.global.tls.enabled }}
+  tls:
+    {{- if .Values.global.tls.certManager.enabled }}
+    - hosts:
+        - {{ $monitorDomain }}
+        - {{ $whoamiDomain }}
+      secretName: {{ $fullName }}-tls
+    {{- else if .Values.global.tls.secretName }}
+    - hosts:
+        - {{ $monitorDomain }}
+        - {{ $whoamiDomain }}
+      secretName: {{ .Values.global.tls.secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ $monitorDomain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-nginx-proxy
+                port:
+                  name: http
+    - host: {{ $whoamiDomain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-nginx-proxy
+                port:
+                  name: http
+{{- end }}

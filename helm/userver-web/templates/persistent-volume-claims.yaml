@@ -1,0 +1,37 @@
+{{- if and .Values.nginxProxy.enabled .Values.nginxProxy.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "userver-web.fullname" . }}-certs
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nginx-proxy
+spec:
+  accessModes:
+    - {{ .Values.nginxProxy.persistence.accessMode }}
+  {{- if .Values.nginxProxy.persistence.storageClass }}
+  storageClassName: {{ .Values.nginxProxy.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.nginxProxy.persistence.size }}
+---
+{{- end }}
+{{- if and .Values.letsencrypt.enabled .Values.letsencrypt.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "userver-web.fullname" . }}-letsencrypt
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: letsencrypt
+spec:
+  accessModes:
+    - {{ .Values.letsencrypt.persistence.accessMode }}
+  {{- if .Values.letsencrypt.persistence.storageClass }}
+  storageClassName: {{ .Values.letsencrypt.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.letsencrypt.persistence.size }}
+{{- end }}

@@ -1,0 +1,27 @@
+{{- if .Values.nginxProxy.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "userver-web.fullname" . }}-nginx-proxy
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nginx-proxy
+  {{- with .Values.nginxProxy.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.nginxProxy.service.type }}
+  ports:
+    - port: {{ .Values.nginxProxy.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.nginxProxy.service.httpsPort }}
+      targetPort: https
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "userver-web.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: nginx-proxy
+{{- end }}

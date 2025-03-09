@@ -1,0 +1,12 @@
+{{- if .Values.nginxProxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "userver-web.fullname" . }}-nginx-config
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nginx-proxy
+data:
+  client_max_body_size.conf: |
+    client_max_body_size {{ .Values.nginxProxy.config.clientMaxBodySize }};
+{{- end }}

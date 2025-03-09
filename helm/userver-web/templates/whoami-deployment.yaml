@@ -1,0 +1,59 @@
+{{- if .Values.whoami.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "userver-web.fullname" . }}-whoami
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: whoami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "userver-web.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: whoami
+  template:
+    metadata:
+      labels:
+        {{- include "userver-web.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: whoami
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "userver-web.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: whoami
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.whoami.image.repository }}:{{ .Values.whoami.image.tag }}"
+          imagePullPolicy: {{ .Values.whoami.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: VIRTUAL_HOST
+              value: {{ include "userver-web.whoamiDomain" . }}
+            - name: LETSENCRYPT_HOST
+              value: {{ include "userver-web.whoamiDomain" . }}
+            - name: LETSENCRYPT_EMAIL
+              value: {{ .Values.letsencrypt.config.email }}
+          resources:
+            {{- toYaml .Values.whoami.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

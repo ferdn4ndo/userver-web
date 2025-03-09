@@ -1,0 +1,81 @@
+{{- if .Values.letsencrypt.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "userver-web.fullname" . }}-letsencrypt
+  labels:
+    {{- include "userver-web.labels" . | nindent 4 }}
+    app.kubernetes.io/component: letsencrypt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "userver-web.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: letsencrypt
+  template:
+    metadata:
+      labels:
+        {{- include "userver-web.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: letsencrypt
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "userver-web.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: letsencrypt
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.letsencrypt.image.repository }}:{{ .Values.letsencrypt.image.tag }}"
+          imagePullPolicy: {{ .Values.letsencrypt.image.pullPolicy }}
+          env:
+            - name: NGINX_PROXY_CONTAINER
+              value: {{ include "userver-web.fullname" . }}-nginx-proxy
+            - name: DEFAULT_EMAIL
+              value: {{ .Values.letsencrypt.config.email }}
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/nginx/certs
+            - name: letsencrypt
+              mountPath: /etc/acme.sh
+            - name: vhost
+              mountPath: /etc/nginx/vhost.d
+            - name: html
+              mountPath: /usr/share/nginx/html
+          resources:
+            {{- toYaml .Values.letsencrypt.resources | nindent 12 }}
+      volumes:
+        - name: certs
+          {{- if .Values.nginxProxy.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "userver-web.fullname" . }}-certs
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: letsencrypt
+          {{- if .Values.letsencrypt.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "userver-web.fullname" . }}-letsencrypt
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: vhost
+          emptyDir: {}
+        - name: html
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
