@@ -13,7 +13,7 @@ jobs: # Docs: <https://git.io/JvxXE>
     runs-on: ubuntu-20.04
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build and deploy uServer Web services
         uses: ./.github/actions/deploy_local
