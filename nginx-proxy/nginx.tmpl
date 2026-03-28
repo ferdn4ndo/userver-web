@@ -150,10 +150,11 @@ server {
 {{ if (and (exists "/etc/nginx/certs/default.crt") (exists "/etc/nginx/certs/default.key")) }}
 server {
 	server_name _; # This is just an invalid value which will never trigger on a real hostname.
-	listen 443 ssl http2;
+	listen 443 ssl;
 	{{ if $enable_ipv6 }}
-	listen [::]:443 ssl http2;
+	listen [::]:443 ssl;
 	{{ end }}
+	http2 on;
 	access_log /var/log/nginx/access.log vhost;
 	return 503;
 
@@ -265,10 +266,11 @@ server {
 
 server {
 	server_name {{ $host }};
-	listen 443 ssl http2 {{ $default_server }};
+	listen 443 ssl {{ $default_server }};
 	{{ if $enable_ipv6 }}
-	listen [::]:443 ssl http2 {{ $default_server }};
+	listen [::]:443 ssl {{ $default_server }};
 	{{ end }}
+	http2 on;
 	access_log /var/log/nginx/access.log vhost;
 
 	{{ if eq $network_tag "internal" }}
@@ -382,10 +384,11 @@ server {
 {{ if (and (not $is_https) (exists "/etc/nginx/certs/default.crt") (exists "/etc/nginx/certs/default.key")) }}
 server {
 	server_name {{ $host }};
-	listen 443 ssl http2 {{ $default_server }};
+	listen 443 ssl {{ $default_server }};
 	{{ if $enable_ipv6 }}
-	listen [::]:443 ssl http2 {{ $default_server }};
+	listen [::]:443 ssl {{ $default_server }};
 	{{ end }}
+	http2 on;
 	access_log /var/log/nginx/access.log vhost;
 	return 500;
 
