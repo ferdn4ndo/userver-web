@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "WARNING: This script will generate a self-signed certificate to be used by nginx to serve HTTPS under local environment."
-read -p "Continue (y/n)?" CONT
+read -r -p "Continue (y/n)?" CONT
 if [ "$CONT" = "y" ]; then
     # from https://letsencrypt.org/docs/certificates-for-localhost/
     openssl req -x509 -out ./certs/default.crt -keyout ./certs/default.key \
