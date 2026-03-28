@@ -5,11 +5,11 @@ echo "THIS IS IRREVERSIBLE!"
 
 echo ""
 echo "Are you sure you want to continue? (LAST CHANCE!)"
-read -p "Type 'Y' to continue or any other key to abort:" -n 1 -r
+read -r -p "Type 'Y' to continue or any other key to abort:" -n 1
 echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   echo "Aborting."
-  [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+  [[ "$0" = "${BASH_SOURCE[0]}" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
 fi
 
 
