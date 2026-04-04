@@ -43,7 +43,7 @@ runs:
 
         echo "== MONITOR ENV =="
         cp "${ROOT_WORK_DIR}/monitor/.env.template" "${ROOT_WORK_DIR}/monitor/.env"
-        sed -i 's#VIRTUAL_HOST=#VIRTUAL_HOST=${{ env.MONITOR_VIRTUAL_HOST }}#g' "${ROOT_WORK_DIR}/monitor/.env"
+        sed -i 's#^VIRTUAL_HOST=.*#VIRTUAL_HOST=${{ env.MONITOR_VIRTUAL_HOST }}#' "${ROOT_WORK_DIR}/monitor/.env"
         cat "${ROOT_WORK_DIR}/monitor/.env"
 
         echo "== NGINX-PROXY ENV =="
@@ -52,7 +52,7 @@ runs:
 
         echo "== WHOAMI ENV =="
         cp "${ROOT_WORK_DIR}/whoami/.env.template" "${ROOT_WORK_DIR}/whoami/.env"
-        sed -i 's/VIRTUAL_HOST=/VIRTUAL_HOST=${{ env.WHOAMI_VIRTUAL_HOST }}/g' "${ROOT_WORK_DIR}/whoami/.env"
+        sed -i 's#^VIRTUAL_HOST=.*#VIRTUAL_HOST=${{ env.WHOAMI_VIRTUAL_HOST }}#' "${ROOT_WORK_DIR}/whoami/.env"
         cat "${ROOT_WORK_DIR}/whoami/.env"
       shell: bash
 
