@@ -357,6 +357,15 @@ server {
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
 
+	# HTTP-01: acme-companion writes tokens under /usr/share/nginx/html (nginx-html volume).
+	# Without this block, pre-cert HTTP only had location / → proxy to app → 404 on challenge URLs.
+	location /.well-known/acme-challenge/ {
+		auth_basic off;
+		allow all;
+		root /usr/share/nginx/html;
+		try_files $uri =404;
+	}
+
 	location / {
 		{{ if eq $proto "uwsgi" }}
 		include uwsgi_params;
