@@ -1,11 +1,17 @@
 services:
   userver-nginx-proxy:
     container_name: userver-nginx-proxy
+    restart: unless-stopped
     image: nginxproxy/nginx-proxy:1.10-alpine
-    # Do not use group_add here: rootless Docker often fails with setgroups: invalid argument
-    # for socket GIDs (e.g. 101000). Default container root can use DOCKER_HOST_SOCK (rootless path).
+    # DOCKER_HOST from userver-web/.env (deploy). Rootless often cannot connect() to a bind-mounted unix
+    # socket from inside containers — use tcp://host.docker.internal:PORT (see repo .env.template).
+    # Supplementary socket GID: deploy writes docker-compose.override.yml (skipped for tcp:// DOCKER_HOST).
     env_file:
       - nginx-proxy/.env
+    environment:
+      DOCKER_HOST: ${NGINX_PROXY_DOCKER_HOST:-unix:///var/run/docker.sock}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # Rootless Docker cannot publish host ports < 1024; set NGINX_HTTP_PORT=8080 etc. in .env
     ports:
       - "${NGINX_HTTP_PORT:-80}:80"
@@ -17,18 +23,23 @@ services:
       - ./nginx-proxy/nginx.tmpl:/app/nginx.tmpl:rw
       - nginx-vhost:/etc/nginx/vhost.d:rw
       - nginx-html:/usr/share/nginx/html:rw
-      # :rw avoids some rootless/docker setups where :ro breaks socket access
-      - ${DOCKER_HOST_SOCK:-/var/run/docker.sock}:/tmp/docker.sock
+      # Same in-container path as letsencrypt/monitor; matches default NGINX_PROXY_DOCKER_HOST unix URL.
+      - ${DOCKER_HOST_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:rw
     labels:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
 
   userver-letsencrypt:
     container_name: userver-letsencrypt
+    restart: unless-stopped
     image: nginxproxy/acme-companion:2.6
     depends_on:
       - userver-nginx-proxy
     env_file:
       - letsencrypt/.env
+    environment:
+      DOCKER_HOST: ${NGINX_PROXY_DOCKER_HOST:-unix:///var/run/docker.sock}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./certs:/etc/nginx/certs:rw
       - nginx-vhost:/etc/nginx/vhost.d:rw
@@ -37,14 +48,20 @@ services:
 
   userver-monitor:
     container_name: userver-monitor
+    restart: unless-stopped
     image: ferdn4ndo/docker-containers-monitor:1.0.1
     env_file:
       - ./monitor/.env
+    environment:
+      DOCKER_HOST: ${NGINX_PROXY_DOCKER_HOST:-unix:///var/run/docker.sock}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ${DOCKER_HOST_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
 
   userver-whoami:
     container_name: userver-whoami
+    restart: unless-stopped
     image: traefik/whoami:v1.11
     expose:
       - 80
