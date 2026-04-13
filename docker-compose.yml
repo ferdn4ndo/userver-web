@@ -2,6 +2,7 @@ services:
   userver-nginx-proxy:
     container_name: userver-nginx-proxy
     image: nginxproxy/nginx-proxy:1.10-alpine
+    restart: unless-stopped
     # Do not use group_add here: rootless Docker often fails with setgroups: invalid argument
     # for socket GIDs (e.g. 101000). Default container root can use DOCKER_HOST_SOCK (rootless path).
     env_file:
@@ -25,6 +26,7 @@ services:
   userver-letsencrypt:
     container_name: userver-letsencrypt
     image: nginxproxy/acme-companion:2.6
+    restart: unless-stopped
     depends_on:
       - userver-nginx-proxy
     env_file:
@@ -38,6 +40,7 @@ services:
   userver-monitor:
     container_name: userver-monitor
     image: ferdn4ndo/docker-containers-monitor:1.0.1
+    restart: unless-stopped
     env_file:
       - ./monitor/.env
     volumes:
@@ -46,6 +49,7 @@ services:
   userver-whoami:
     container_name: userver-whoami
     image: traefik/whoami:v1.11
+    restart: unless-stopped
     expose:
       - 80
     env_file:
