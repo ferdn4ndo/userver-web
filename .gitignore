@@ -4,6 +4,8 @@ venv
 temp
 tmp
 
+docker-compose.override.yml
+
 monitor/html/stats.txt
 
 nginx-proxy/conf/default.conf
