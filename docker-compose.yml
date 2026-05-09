@@ -27,6 +27,14 @@ services:
       - ${DOCKER_HOST_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:rw
     labels:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
+    # docker-gen discovers “this container” via HOSTNAME (12-char id) + cgroup; Compose sets
+    # hostname (UTS) but often does not set HOSTNAME in the process env for PID 1. Without it,
+    # CurrentContainerID resolution can fail on cgroup v2 → empty upstream { } and nginx emerg.
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - export HOSTNAME="$$(hostname)"; exec /app/docker-entrypoint.sh forego start -r
 
   userver-letsencrypt:
     container_name: userver-letsencrypt
